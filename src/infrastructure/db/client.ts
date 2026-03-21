@@ -1,0 +1,1 @@
+export { prisma } from "@/app/infrastructure/db/client";
