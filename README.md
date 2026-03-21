@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Car Brands API + Frontend
 
-## Getting Started
+Demostración de ejemplo de aplicación web full stack construida con Next.js (App Router), Prisma y PostgreSQL.
 
-First, run the development server:
+Incluye:
+
+- API REST para gestionar marcas de autos (CRUD).
+- Frontend sencillo para consumir la API (crear, listar, editar y eliminar).
+- Estructura por capas inspirada en arquitectura limpia.
+- Pruebas unitarias en la capa de casos de uso.
+
+## Objetivo del proyecto
+
+Este proyecto fue construido para demostrar:
+
+- Separación de responsabilidades por capas.
+- Integración de base de datos con Prisma.
+- Buenas prácticas de seguridad y despliegue para un entorno académico.
+
+## Tecnologías usadas
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Prisma ORM 7
+- PostgreSQL
+- Tailwind CSS
+- Vitest (tests unitarios)
+
+## Arquitectura y estructura
+
+La app sigue una separación por capas:
+
+- `src/core`: Entidades de dominio y contratos de repositorios.
+- `src/application`: Casos de uso (lógica de aplicación).
+- `src/infrastructure`: Implementaciones concretas y acceso a DB con Prisma.
+- `src/app/api`: Route Handlers, validación, respuestas y rate limit.
+- `src/app/page.tsx`: Frontend que consume la API.
+
+## Cómo funciona la web
+
+El frontend principal permite:
+
+- Ver todas las marcas existentes.
+- Crear una nueva marca.
+- Editar una marca por id.
+- Eliminar una marca.
+
+Todas estas acciones llaman a la API interna en:
+
+- `GET /api/brands`
+- `POST /api/brands`
+- `GET /api/brands/:id`
+- `PUT /api/brands/:id`
+- `DELETE /api/brands/:id`
+
+## Configuración local
+
+### 1) Instalar dependencias
+
+```bash
+npm install
+```
+
+### 2) Variables de entorno
+
+Crear archivo `.env` en la raíz con:
+
+```bash
+DATABASE_URL="postgresql://usuario:password@localhost:5432/car_brands_db?schema=public"
+```
+
+### 3) Generar cliente Prisma
+
+```bash
+npm exec prisma generate
+```
+
+### 4) Ejecutar migraciones
+
+```bash
+npm exec prisma migrate dev
+```
+
+### 5) Ejecutar en desarrollo
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Aplicación disponible en `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts principales
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Desarrollo: `npm run dev`
+- Build de producción: `npm run build`
+- Ejecutar build: `npm run start`
+- Lint: `npm run lint`
+- Tests unitarios: `npm run test`
+- Tests modo watch: `npm run test:watch`
 
-## Learn More
+## Pruebas
 
-To learn more about Next.js, take a look at the following resources:
+Las pruebas actuales cubren los casos de uso de marcas con un repositorio en memoria.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Archivo principal:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `src/application/use-cases/brands/BrandUseCases.test.ts`
 
-## Deploy on Vercel
+Ejecución:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run test
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Seguridad aplicada
+
+Se implementaron mejoras de seguridad manteniendo la app simple:
+
+- Secretos fuera del repositorio (`.env*` ignorado en git).
+- Logs de Prisma reducidos en producción (solo errores).
+- Validación de entrada en API (`id` válido y `name/nombre` con longitud controlada).
+- Rate limit para operaciones de escritura (`POST`, `PUT`, `DELETE`) por IP y ventana de tiempo.
+- Respuestas API con cabeceras de seguridad básicas:
+  - `Cache-Control: no-store`
+  - `X-Content-Type-Options: nosniff`
+- Cabeceras globales en Next.js:
+  - `X-Frame-Options: DENY`
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+  - `Permissions-Policy` restringida
+- `X-Powered-By` deshabilitado.
+
+Importante: el rate limit en memoria funciona bien para demo y evaluación. En producción de alto tráfico conviene moverlo a Redis/KV compartido.

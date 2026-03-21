@@ -9,14 +9,15 @@ if (!connectionString) {
 
 const adapter = new PrismaPg({ connectionString });
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const isProduction = process.env.NODE_ENV === "production";
 
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
     adapter,
-    log: ["query"],
+    log: isProduction ? ["error"] : ["query", "error", "warn"],
   });
 
-if (process.env.NODE_ENV !== "production") {
+if (!isProduction) {
   globalForPrisma.prisma = prisma;
 }

@@ -1,6 +1,7 @@
 import { makeBrandDependencies } from "@/app/api/_lib/brandDependencies";
 import { parseBrandName } from "@/app/api/_lib/brandValidation";
-import { jsonError, jsonOk } from "@/app/api/_lib/http";
+import { jsonError, jsonOk, tooManyRequests } from "@/app/api/_lib/http";
+import { enforceRateLimit } from "@/app/api/_lib/rateLimit";
 
 export async function GET(): Promise<Response> {
   try {
@@ -14,8 +15,24 @@ export async function GET(): Promise<Response> {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  const rateLimitResult = enforceRateLimit(request, "brands:create", {
+    windowMs: 60_000,
+    maxRequests: 20,
+  });
+
+  if (!rateLimitResult.ok) {
+    return tooManyRequests(rateLimitResult.retryAfterSeconds);
+  }
+
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    let body: Record<string, unknown>;
+
+    try {
+      body = (await request.json()) as Record<string, unknown>;
+    } catch {
+      return jsonError("Invalid JSON body", 400);
+    }
+
     const name = parseBrandName(body);
 
     if (!name) {
