@@ -27,8 +27,16 @@ export async function GET(
     }
 
     return jsonOk(brand);
-  } catch {
-    return jsonError("Internal server error", 500);
+  } catch (error) {
+    console.error("[GET /api/brands/:id]", error);
+    const message =
+      process.env.NODE_ENV === "production"
+        ? "Internal server error"
+        : error instanceof Error
+          ? error.message
+          : "Internal server error";
+
+    return jsonError(message, 500);
   }
 }
 
@@ -75,8 +83,16 @@ export async function PUT(
     }
 
     return jsonOk(updatedBrand);
-  } catch {
-    return jsonError("Internal server error", 500);
+  } catch (error) {
+    console.error("[PUT /api/brands/:id]", error);
+    const message =
+      process.env.NODE_ENV === "production"
+        ? "Internal server error"
+        : error instanceof Error
+          ? error.message
+          : "Internal server error";
+
+    return jsonError(message, 500);
   }
 }
 
@@ -109,7 +125,15 @@ export async function DELETE(
     }
 
     return new Response(null, { status: 204 });
-  } catch {
-    return jsonError("Internal server error", 500);
+  } catch (error) {
+    console.error("[DELETE /api/brands/:id]", error);
+    const message =
+      process.env.NODE_ENV === "production"
+        ? "Internal server error"
+        : error instanceof Error
+          ? error.message
+          : "Internal server error";
+
+    return jsonError(message, 500);
   }
 }

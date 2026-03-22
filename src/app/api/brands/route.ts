@@ -9,8 +9,16 @@ export async function GET(): Promise<Response> {
     const brands = await findAllBrands.execute();
 
     return jsonOk(brands);
-  } catch {
-    return jsonError("Internal server error", 500);
+  } catch (error) {
+    console.error("[GET /api/brands]", error);
+    const message =
+      process.env.NODE_ENV === "production"
+        ? "Internal server error"
+        : error instanceof Error
+          ? error.message
+          : "Internal server error";
+
+    return jsonError(message, 500);
   }
 }
 
@@ -43,7 +51,15 @@ export async function POST(request: Request): Promise<Response> {
     const brand = await createBrand.execute(name);
 
     return jsonOk(brand, 201);
-  } catch {
-    return jsonError("Internal server error", 500);
+  } catch (error) {
+    console.error("[POST /api/brands]", error);
+    const message =
+      process.env.NODE_ENV === "production"
+        ? "Internal server error"
+        : error instanceof Error
+          ? error.message
+          : "Internal server error";
+
+    return jsonError(message, 500);
   }
 }
