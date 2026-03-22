@@ -196,8 +196,8 @@ export default function Home(): React.JSX.Element {
           <h1 className="mt-2 text-3xl font-bold text-zinc-900">
             Panel de marcas
           </h1>
-          <p className="mt-2 text-zinc-600">
-            Interfaz simple usando arquitectura limpia y API CRUD.
+          <p className="mt-2 text-zinc-600"> 
+            Demostración de ejemplo de aplicación web full stack construida con Next.js (App Router), Prisma y PostgreSQL.
           </p>
         </header>
 
