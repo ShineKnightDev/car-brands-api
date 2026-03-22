@@ -197,7 +197,7 @@ export default function Home(): React.JSX.Element {
             Panel de marcas
           </h1>
           <p className="mt-2 text-zinc-600">
-            Interfaz simple para practicar arquitectura limpia consumiendo tu API CRUD.
+            Interfaz simple usando arquitectura limpia y API CRUD.
           </p>
         </header>
 
